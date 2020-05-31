@@ -252,6 +252,17 @@ version = "2.2.0"
 
 [[package]]
 category = "main"
+description = "Python module for JUMAN/KNP."
+name = "pyknp"
+optional = false
+python-versions = "*"
+version = "0.4.1"
+
+[package.dependencies]
+six = "*"
+
+[[package]]
+category = "main"
 description = "Python client to neovim"
 name = "pynvim"
 optional = false
@@ -315,7 +326,7 @@ python-versions = "*"
 version = "2020.5.14"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python 2 and 3 compatibility utilities"
 name = "six"
 optional = false
@@ -368,7 +379,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "6ff46e042bc1f9c88e47f2c313b71f07da6422425746713d18d9a68b29f79a38"
+content-hash = "306e28e1f7fae4933693c2653806f9aaea583a80044ef7693f04b9048c06df3f"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -517,6 +528,10 @@ pycodestyle = [
 pyflakes = [
     {file = "pyflakes-2.2.0-py2.py3-none-any.whl", hash = "sha256:0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92"},
     {file = "pyflakes-2.2.0.tar.gz", hash = "sha256:35b2d75ee967ea93b55750aa9edbbf72813e06a66ba54438df2cfac9e3c27fc8"},
+]
+pyknp = [
+    {file = "pyknp-0.4.1-py2-none-any.whl", hash = "sha256:98922d13395512fa4def77c15cf9fe4c81c65c072ba432db68a4fde1309f1193"},
+    {file = "pyknp-0.4.1-py3-none-any.whl", hash = "sha256:5d165a0387f493bf72e917f56ca55047d162d5f5771a06d713012c428efdd480"},
 ]
 pynvim = [
     {file = "pynvim-0.4.1.tar.gz", hash = "sha256:55e918d664654cfa1c9889d3dbe7c63e9f338df5d49471663f78d54c85e84c58"},
