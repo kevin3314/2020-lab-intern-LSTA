@@ -18,16 +18,23 @@ class LSTM_divider(nn.Module):
 
     def forward(self, idseq, length_list):
         batchsize, sent_len = idseq.size()
-        idseq = torch.transpose(idseq, 0, 1)  # (batchsize, sent_len) -> (sent_len, batchsize)
+        # (batchsize, sent_len) -> (sent_len, batchsize)
+        idseq = torch.transpose(idseq, 0, 1)
         emb = self.embdic(idseq)
 
-        packed_emb = nn.utils.rnn.pack_padded_sequence(emb, length_list, enforce_sorted=False)
-        h, c = self.init_lstm_state(batchsize, self.h_dims, device=idseq.device)
+        packed_emb = nn.utils.rnn.pack_padded_sequence(
+            emb, length_list, enforce_sorted=False
+        )
+        h, c = self.init_lstm_state(
+                batchsize, self.h_dims, device=idseq.device)
         packed_hidden, (h, c) = self.lstm(packed_emb, (h, c))
-        unpacked_hidden, length_list2 = nn.utils.rnn.pad_packed_sequence(packed_hidden)
-        unpacked_hidden = torch.transpose(unpacked_hidden, 0, 1)  # (sent_len, batchsize, hdims) -> (batchsize, sent_len, hdims)
+        unpacked_hidden, length_list2 = nn.utils.rnn.pad_packed_sequence(
+                packed_hidden)
+        # (sent_len, batchsize, hdims) -> (batchsize, sent_len, hdims)
+        unpacked_hidden = torch.transpose(unpacked_hidden, 0, 1)
 
         # average on hidden dims
+        # (batchsize, sent_len, hdims) -> (batchsize, sent_len)
         hidden_avg = torch.sum(unpacked_hidden, axis=-1) / self.h_dims
         out = torch.sigmoid(hidden_avg)
 
