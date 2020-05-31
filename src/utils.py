@@ -29,16 +29,16 @@ class Dataset(torch.utils.data.Dataset):
         return [self.char2idx.get(char, UNK_ID) for char in sentence]
 
 
-def make_batch(ids_list):
-    batchsize = len(ids_list)
+def make_batch(idseq_list):
+    batchsize = len(idseq_list)
+    length_list = torch.tensor(list(map(lambda x: len(x), idseq_list)))
+    maxlen = max(length_list)
+    idseq = PAD_ID * torch.ones((batchsize, maxlen), dtype=torch.long)
 
-    maxlen = ids_list.max(dim=1)
-    ids = PAD_ID * torch.ones((batchsize, maxlen), dtype=torch.long)
+    for idx, idseq_orig in enumerate(idseq_list):
+        idseq[idx, :len(idseq_orig)] = torch.tensor(idseq_orig)
 
-    for idx, id in enumerate(ids_list):
-        ids[idx, :len(id)] = torch.tensor(id)
-
-    return ids
+    return idseq, length_list
 
 
 class EarlyStopping():
