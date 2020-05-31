@@ -1,36 +1,33 @@
+import pickle
+
 import numpy as np
 import torch
 
-from consts import UNK_ID, PAD_ID
+from consts import UNK_ID, PAD_ID, char2idx
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, data_path, word2idx):
+    def __init__(self, data_path, char2idx):
         self.data = self.load_data(data_path)
-        self.word2idx = word2idx
-        self.label2idx = label2idx
+        self.char2idx = char2idx
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
         data = self.data[idx]
+        ids = self.chars2idxs(data)
 
-        label, former, latter = data
-
-        former_idxs = self.words2idxs(former)
-        latter_idxs = self.words2idxs(latter)
-
-        return label, former_idxs, latter_idxs
+        return ids
 
     def load_data(self, path):
-        with open(path) as f:
-            res = f.readlines()
+        with open(path, 'rb') as f:
+            res = pickle.load(f)
 
         return res
 
-    def words2idxs(self, words):
-        return [self.word2idx.get(word, UNK_ID) for word in words.split()]
+    def chars2idxs(self, sentence):
+        return [self.char2idx.get(char, UNK_ID) for char in sentence]
 
 
 def make_batch(label_former_latter_list):
