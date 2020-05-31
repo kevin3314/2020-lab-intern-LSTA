@@ -38,7 +38,19 @@ class Dataset(torch.utils.data.Dataset):
 
         for mrph in result.mrph_list():
             current = current + len(mrph.midasi)
-            offset[current-1] = 1
+            try:
+                offset[current-1] = 1
+
+            except IndexError as e:
+                print(sentence)
+                print(current)
+                for _mrph in result.mrph_list():
+                    print(_mrph.midasi)
+                raise e
+
+            except Exception as e:
+                raise e
+
         return offset
 
 

@@ -9,7 +9,6 @@ def count_char(sentences):
     co = Counter(sentences)
 
     sorted_co = sorted(co.items(), key=lambda x: x[1], reverse=True)
-    print(sorted_co)
     sorted_co = [v for v in sorted_co if v[1] >= 2]
 
     char2idx = {}

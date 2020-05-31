@@ -20,7 +20,7 @@ def main():
     dev_path = osp.join(DATA_ROOT, 'Valid_Data_F.pickle')
     test_path = osp.join(DATA_ROOT, 'Test_Data_F.pickle')
 
-    train.run_bert(
+    train.run(
             train_path,
             dev_path,
             BATCH_SIZE,
