@@ -13,6 +13,7 @@ flake8 = "^3.8.2"
 pynvim = "^0.4.1"
 jedi = "^0.17.0"
 torch = "1.4.0"
+numpy = "^1.18.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.6"
