@@ -1,47 +1,44 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from transformers import BertModel
-
-from consts import PAD_ID
 
 
-class Classfier(nn.Module):
-    def __init__(self, emb_tensor):
-        super(Classfier, self).__init__()
-        self.embdic = nn.Embedding.from_pretrained(
-            emb_tensor, padding_idx=PAD_ID)
+class LSTM_divider(nn.Module):
+    def __init__(self, emb_tensor, h_dims=100, dropout=0.1):
+        super(LSTM_divider, self).__init__()
+        self.embdic = nn.Embedding.from_pretrained(emb_tensor)
         self.w_dims = emb_tensor.shape[1]
+        self.h_dims = h_dims
 
-        # Define FCL
-        self.l0 = nn.Linear(self.w_dims, 128)
-        self.l1 = nn.Linear(self.w_dims, 128)
-        self.l2 = nn.Linear(128*2, 3, bias=False)
+        # Define LSTM
+        self.lstm = nn.LSTM(self.w_dims, self.h_dims)
 
         # Define Dropout
         p = 0.1
         self.dropout = nn.Dropout(p=p)
 
-    def forward(self, former_idxs, latter_idxs):
-        former_emb = self.embdic(former_idxs)
-        latter_emb = self.embdic(latter_idxs)
-        former_emb = self.dropout(former_emb)
-        latter_emb = self.dropout(latter_emb)
+    def forward(self, idseq, length_list):
+        batchsize, sent_len = idseq.size()
+        idseq = torch.transpose(idseq, 0, 1)  # (batchsize, sent_len) -> (sent_len, batchsize)
+        emb = self.embdic(idseq)
 
-        former = torch.sum(former_emb, 1)
-        latter = torch.sum(latter_emb, 1)
+        packed_emb = nn.utils.rnn.pack_padded_sequence(emb, length_list, enforce_sorted=False)
+        h, c = self.init_lstm_state(batchsize, self.h_dims, device=idseq.device)
+        packed_hidden, (h, c) = self.lstm(packed_emb, (h, c))
+        unpacked_hidden, length_list2 = nn.utils.rnn.pad_packed_sequence(packed_hidden)
+        unpacked_hidden = torch.transpose(unpacked_hidden, 0, 1)  # (sent_len, batchsize, hdims) -> (batchsize, sent_len, hdims)
 
-        num_former_words = (former_idxs != PAD_ID).sum()
-        num_latter_words = (latter_idxs != PAD_ID).sum()
-        former /= num_former_words
-        latter /= num_latter_words
+        # average on hidden dims
+        hidden_avg = torch.sum(unpacked_hidden, axis=-1) / self.h_dims
+        out = torch.sigmoid(hidden_avg)
 
-        former = F.relu(self.l0(former))
-        latter = F.relu(self.l1(latter))
-        former = self.dropout(former)
-        latter = self.dropout(latter)
+        return out
 
-        catted = torch.cat([former, latter], axis=-1)
-        logit = self.l2(catted)
-
-        return logit
+    def init_lstm_state(self, batchsize, hdims, device=None):
+        h, c = torch.zeros(batchsize, hdims), torch.zeros(batchsize, hdims)
+        # (1, batchsize, hdims)
+        h = h.expand(1, batchsize, hdims)
+        c = c.expand(1, batchsize, hdims)
+        if device is not None:
+            h = h.to(device)
+            c = c.to(device)
+        return h, c
