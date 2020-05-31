@@ -1,5 +1,6 @@
 import pickle
 
+from pyknp import Juman
 import torch
 
 from consts import UNK_ID, PAD_ID
@@ -16,8 +17,9 @@ class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         data = self.data[idx]
         ids = self.chars2idxs(data)
+        target = self.calc_position(data)
 
-        return ids
+        return ids, target
 
     def load_data(self, path):
         with open(path, 'rb') as f:
@@ -27,6 +29,17 @@ class Dataset(torch.utils.data.Dataset):
 
     def chars2idxs(self, sentence):
         return [self.char2idx.get(char, UNK_ID) for char in sentence]
+
+    def calc_position(self, sentence):
+        juman = Juman()
+        result = juman.analysis(sentence)
+        current = 0
+        offset = [0 for _ in range(len(sentence))]
+
+        for mrph in result.mrph_list():
+            current = current + len(mrph.midasi)
+            offset[current-1] = 1
+        return offset
 
 
 def make_batch(idseq_list):
