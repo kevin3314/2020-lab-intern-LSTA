@@ -5,8 +5,7 @@ from consts import UNK_ID, PAD_ID
 
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, data_path, word2idx, label2idx, mode='train'):
-        self.mode = mode
+    def __init__(self, data_path, word2idx):
         self.data = self.load_data(data_path)
         self.word2idx = word2idx
         self.label2idx = label2idx
@@ -27,17 +26,6 @@ class Dataset(torch.utils.data.Dataset):
     def load_data(self, path):
         with open(path) as f:
             res = f.readlines()
-
-        # strip
-        res = [v.strip() for v in res]
-
-        if self.mode == 'train' or self.mode == 'valid':
-            res = [v.split('\t') for v in res]
-        elif self.mode == 'test':
-            # append dummy label
-            res = [['neutral', *v.split('\t')] for v in res]
-        else:
-            raise AttributeError('Dataset.mode should be train/valid/test')
 
         return res
 
