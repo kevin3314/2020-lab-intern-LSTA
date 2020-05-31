@@ -42,16 +42,18 @@ class Dataset(torch.utils.data.Dataset):
         return offset
 
 
-def make_batch(idseq_list):
+def make_batch(idseq_list, target):
     batchsize = len(idseq_list)
     length_list = torch.tensor(list(map(lambda x: len(x), idseq_list)))
     maxlen = max(length_list)
+
     idseq = PAD_ID * torch.ones((batchsize, maxlen), dtype=torch.long)
+    target = torch.tensor(target, dtype=torch.long)
 
     for idx, idseq_orig in enumerate(idseq_list):
         idseq[idx, :len(idseq_orig)] = torch.tensor(idseq_orig)
 
-    return idseq, length_list
+    return idseq, length_list, target
 
 
 class EarlyStopping():
