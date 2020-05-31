@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+import pickle
 
 
 def main(DATA_ROOT):
@@ -15,6 +16,12 @@ def main(DATA_ROOT):
         # In this case, 。 can be removed safely
         sentences = re.split(r"[。\n]", content)
         sentences = [line for line in sentences if len(line) != 0]
+
+        file_name = text_file.name[:-4] + '.pickle'
+        dic = text_file.parent
+
+        with open(Path(dic, file_name), 'wb') as f:
+            pickle.dump(sentences, f)
 
 
 if __name__ == '__main__':
