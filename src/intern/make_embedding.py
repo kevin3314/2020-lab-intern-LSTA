@@ -22,20 +22,21 @@ def count_char(sentences):
 def get_init_embedding(char2idx, w_dim=128):
     num_words = len(char2idx) + 2  # UNK
     id_max = max(char2idx.values())
-    char2idx['UNK'] = id_max + 1
-    char2idx['PAD'] = id_max + 2
+    UNK_ID = id_max + 1
+    PAD_ID = id_max + 2
+    char2idx['UNK'] = UNK_ID
+    char2idx['PAD'] = PAD_ID
 
     emb = torch.randn(num_words, w_dim)
-    return emb
+    return UNK_ID, PAD_ID, emb
 
 
-if __name__ == '__main__':
-    DATA = 'data/original/Train_Data_F.pickle'
+DATA = 'data/original/Train_Data_F.pickle'
 
-    with open(DATA, 'rb') as f:
-        sentences = pickle.load(f)
-    char2idx = count_char(sentences)
+with open(DATA, 'rb') as f:
+    sentences = pickle.load(f)
+char2idx = count_char(sentences)
 
-    init_emb = get_init_embedding(char2idx)
-    print(init_emb.shape)
-    print(char2idx)
+UNK_ID, PAD_ID, init_emb = get_init_embedding(char2idx)
+print(init_emb.shape)
+print(char2idx)
