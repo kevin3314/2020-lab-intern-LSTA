@@ -9,24 +9,22 @@ import utils
 from model import LSTM_divider
 
 
-def train_fn(model, data_loader, device, epochs=50):
+def train_fn(model, data_loader, device):
     model.train()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     total_loss = 0.0
     tk0 = tqdm(data_loader, total=len(data_loader), desc="Training")
 
-    for batch_idx, data in enumerate(tk0):
-        label, former_idxs, latter_idxs = data
-
-        label = label.to(device)
-        former_idxs = former_idxs.to(device)
-        latter_idxs = latter_idxs.to(device)
+    for batch_idx, (idseq, length_list, target) in enumerate(tk0):
+        idseq = idseq.to(device)
+        length_list = length_list.to(device)
+        target = target.to(device)
 
         model.zero_grad()
-        output = model(former_idxs, latter_idxs)
-        criterion = nn.CrossEntropyLoss()
-        loss = criterion(output, label)
+        output = model(idseq, length_list)
+        criterion = nn.BCELoss()
+        loss = criterion(output, target)
 
         loss.backward()
         optimizer.step()
@@ -116,4 +114,3 @@ def run(
             print(f'Best precision -> {es.best}')
             torch.save(net.state_dict(), path)
             return
-
