@@ -1,9 +1,8 @@
 import pickle
 
-import numpy as np
 import torch
 
-from consts import UNK_ID, PAD_ID, char2idx
+from consts import UNK_ID, PAD_ID
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -30,27 +29,16 @@ class Dataset(torch.utils.data.Dataset):
         return [self.char2idx.get(char, UNK_ID) for char in sentence]
 
 
-def make_batch(label_former_latter_list):
-    batchsize = len(label_former_latter_list)
-    labels = []
-    length_list = []
+def make_batch(ids_list):
+    batchsize = len(ids_list)
 
-    for label, former_ids, latter_ids in label_former_latter_list:
-        labels.append(label)
-        length_list.append(len(former_ids))
-        length_list.append(len(latter_ids))
+    maxlen = ids_list.max(dim=1)
+    ids = PAD_ID * torch.ones((batchsize, maxlen), dtype=torch.long)
 
-    maxlen = max(length_list)
+    for idx, id in enumerate(ids_list):
+        ids[idx, :len(id)] = torch.tensor(id)
 
-    labels = torch.tensor(labels)
-    former_ids = PAD_ID * torch.ones((batchsize, maxlen), dtype=torch.long)
-    latter_ids = PAD_ID * torch.ones((batchsize, maxlen), dtype=torch.long)
-
-    for idx, (_, former_id, latter_id) in enumerate(label_former_latter_list):
-        former_ids[idx, :len(former_id)] = torch.tensor(former_id)
-        latter_ids[idx, :len(latter_id)] = torch.tensor(latter_id)
-
-    return labels, former_ids, latter_ids
+    return ids
 
 
 class EarlyStopping():
