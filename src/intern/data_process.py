@@ -16,6 +16,7 @@ def main(DATA_ROOT):
         # In this case, 。 can be removed safely
         sentences = re.split(r"[。\n]", content)
         sentences = [line for line in sentences if len(line) != 0]
+        sentences = [''.join(line.split()) for line in sentences]
 
         file_name = text_file.name[:-4] + '.pickle'
         dic = text_file.parent
