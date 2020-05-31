@@ -35,8 +35,6 @@ DATA = 'data/original/Train_Data_F.pickle'
 
 with open(DATA, 'rb') as f:
     sentences = pickle.load(f)
-char2idx = count_char(sentences)
+CHAR2IDX = count_char(sentences)
 
-UNK_ID, PAD_ID, init_emb = get_init_embedding(char2idx)
-print(init_emb.shape)
-print(char2idx)
+UNK_ID, PAD_ID, EMB_TENSOR = get_init_embedding(CHAR2IDX)

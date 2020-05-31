@@ -3,11 +3,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
-from transformers import BertTokenizer
 
 import consts
 import utils
-from model import Classfier, BertClassifier
+from model import LSTM_divider
 
 
 def train_fn(model, data_loader, device, epochs=50):
@@ -81,13 +80,13 @@ def run(
         ):
 
     # Build model
-    net = Classfier(consts.EMB_TENSOR)
+    net = LSTM_divider(consts.EMB_TENSOR)
     net.to(device)
 
     train_dataset = utils.Dataset(
-        train_path, consts.WORD2IDX, consts.LABEL2IDX)
+        train_path, consts.CHAR2IDX)
     val_dataset = utils.Dataset(
-        dev_path, consts.WORD2IDX, consts.LABEL2IDX)
+        dev_path, consts.CHAR2IDX)
 
     train_data_loader = torch.utils.data.DataLoader(
         train_dataset,
