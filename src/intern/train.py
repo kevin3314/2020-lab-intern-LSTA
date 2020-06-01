@@ -35,7 +35,7 @@ def train_fn(model, data_loader, device):
     print(f'total loss {total_loss}')
 
 
-def eval_fn(model, data_loader, device):
+def valid_fn(model, data_loader, device):
     model.eval()
 
     with torch.no_grad():
@@ -128,7 +128,7 @@ def run(
     for epoch in range(1, epochs + 1):
         print(f'epoch {epoch}')
         train_fn(net, train_data_loader, device)
-        precision = eval_fn(net, val_data_loader, device)
+        precision = valid_fn(net, val_data_loader, device)
 
         # If score is not improved during certain term,
         # stop running
