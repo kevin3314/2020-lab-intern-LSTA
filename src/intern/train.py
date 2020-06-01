@@ -50,22 +50,23 @@ def eval_fn(model, data_loader, device):
             length_list = length_list.to(device)
             target = target.to(device)
 
-            total_len += target.shape[0]
+            total_len += target.shape[0] * target.shape[1]
 
             output = model(idseq, length_list)
             criterion = nn.BCELoss()
             loss = criterion(output, target)
 
-            # preds = output.argmax(dim=-1)
-            # corrects = torch.sum(preds == label)
-            # num_correct += corrects.item()
+            preds = (output > 0.5).type(torch.LongTensor).cpu()
+            target = target.cpu()
+
+            corrects = torch.sum(preds == target)
+            num_correct += corrects.item()
 
             total_loss += loss.item()
             tk0.set_postfix(loss=loss.item())
-        # print(f'precision -> {num_correct / total_len}')
+        print(f'precision -> {num_correct / total_len}')
         print(f'total loss -> {total_loss}')
-        return total_loss
-        # return num_correct / total_len
+        return num_correct / total_len
 
 
 def run(
