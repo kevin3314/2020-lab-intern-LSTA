@@ -20,11 +20,16 @@ def main(DATA_ROOT):
         sentences = [line for line in sentences if len(line) != 0]
         sentences = [''.join(line.split()) for line in sentences]
 
+        # Offset
+        offsets = [calc_position(sentence) for sentence in sentences]
+
+        results = (sentences, offsets)
+
         file_name = text_file.name[:-4] + '.pickle'
         dic = text_file.parent
 
         with open(Path(dic, file_name), 'wb') as f:
-            pickle.dump(sentences, f)
+            pickle.dump(results, f)
 
 
 def calc_position(self, sentence):
