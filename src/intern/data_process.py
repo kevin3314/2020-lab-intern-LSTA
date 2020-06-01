@@ -3,6 +3,7 @@ from pathlib import Path
 import pickle
 
 from pyknp import Juman
+from tqdm import tqdm
 
 
 def main(DATA_ROOT):
@@ -20,8 +21,43 @@ def main(DATA_ROOT):
         sentences = [line for line in sentences if len(line) != 0]
         sentences = [''.join(line.split()) for line in sentences]
 
-        # Offset
-        offsets = [calc_position(sentence) for sentence in sentences]
+        # Remove sentence which is not properly parsed
+        val_sentences = []
+        offsets = []
+
+        juman = Juman()
+
+        for sentence in tqdm(sentences):
+            # Try to parse
+            try:
+                result = juman.analysis(sentence)
+
+            except ValueError:
+                print(sentence)
+
+            except Exception as e:
+                raise e
+
+            current = 0
+            offset = [0 for _ in range(len(sentence))]
+
+            for mrph in result.mrph_list():
+                current = current + len(mrph.midasi)
+                try:
+                    offset[current-1] = 1
+
+                except IndexError as e:
+                    print(sentence)
+                    print(current)
+                    for _mrph in result.mrph_list():
+                        print(_mrph.midasi)
+                    raise e
+
+                except Exception as e:
+                    raise e
+
+            val_sentences.append(sentence)
+            offsets.append(offset)
 
         results = (sentences, offsets)
 
@@ -32,9 +68,14 @@ def main(DATA_ROOT):
             pickle.dump(results, f)
 
 
-def calc_position(self, sentence):
+def calc_position(sentence):
     juman = Juman()
-    result = juman.analysis(sentence)
+    try:
+        result = juman.analysis(sentence)
+    except ValueError as e:
+        print(sentence)
+        raise e
+
     current = 0
     offset = [0 for _ in range(len(sentence))]
 
