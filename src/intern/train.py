@@ -23,6 +23,7 @@ def train_fn(model, data_loader, device):
 
         model.zero_grad()
         output = model(idseq, length_list)
+
         criterion = nn.BCELoss()
         loss = criterion(output, target)
 
@@ -44,28 +45,27 @@ def eval_fn(model, data_loader, device):
 
         tk0 = tqdm(data_loader, total=len(data_loader), desc="Training")
 
-        for batch_idx, data in enumerate(tk0):
-            label, former_idxs, latter_idxs = data
-            total_len += label.shape[0]
+        for batch_idx, (idseq, length_list, target) in enumerate(tk0):
+            idseq = idseq.to(device)
+            length_list = length_list.to(device)
+            target = target.to(device)
 
-            label = label.to(device)
-            former_idxs = former_idxs.to(device)
-            latter_idxs = latter_idxs.to(device)
+            total_len += target.shape[0]
 
-            output = model(former_idxs, latter_idxs)
+            output = model(idseq, length_list)
+            criterion = nn.BCELoss()
+            loss = criterion(output, target)
 
-            criterion = nn.CrossEntropyLoss()
-            loss = criterion(output, label)
-
-            preds = output.argmax(dim=-1)
-            corrects = torch.sum(preds == label)
-            num_correct += corrects.item()
+            # preds = output.argmax(dim=-1)
+            # corrects = torch.sum(preds == label)
+            # num_correct += corrects.item()
 
             total_loss += loss.item()
             tk0.set_postfix(loss=loss.item())
-        print(f'precision -> {num_correct / total_len}')
+        # print(f'precision -> {num_correct / total_len}')
         print(f'total loss -> {total_loss}')
-        return num_correct / total_len
+        return total_loss
+        # return num_correct / total_len
 
 
 def run(
