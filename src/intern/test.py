@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
+import consts
+import utils
+from model import LSTM_divider
+
 
 def eval_fn(
         model,
@@ -50,6 +54,36 @@ def eval_fn(
         print(f'Average F1 -> {total_F / total_len}')
         print(f'total loss -> {total_loss}')
         return total_F / total_len
+
+
+def run(
+        test_path,
+        batch_size,
+        device,
+        epochs=50,
+        path="weights/model.bin"
+        ):
+
+    # Build model
+    print('Building model ...')
+    net = LSTM_divider(consts.voc_size)
+    net.load_state_dict(torch.load(path))
+    net.to(device)
+    print('Done!')
+
+    print('Building dataset ...')
+    test_dataset = utils.Dataset(
+        test_path, consts.CHAR2IDX)
+
+    test_data_loader = torch.utils.data.DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        collate_fn=utils.make_batch
+    )
+    print('Done!')
+
+    eval_fn(net, test_data_loader, device)
 
 
 def nan_to_num(t, mynan=0.):
