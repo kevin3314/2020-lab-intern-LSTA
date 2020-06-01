@@ -79,7 +79,7 @@ def run(
 
     # Build model
     print('Building model ...')
-    net = LSTM_divider(consts.EMB_TENSOR)
+    net = LSTM_divider(consts.voc_size)
     net.to(device)
     print('Done!')
 

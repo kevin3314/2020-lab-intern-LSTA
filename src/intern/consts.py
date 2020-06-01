@@ -19,15 +19,14 @@ def count_char(sentences):
 
 
 def get_init_embedding(char2idx, w_dim=128):
-    num_words = len(char2idx) + 2  # UNK
+    voc_size = len(char2idx) + 2  # UNK
     id_max = max(char2idx.values())
     UNK_ID = id_max + 1
     PAD_ID = id_max + 2
     char2idx['UNK'] = UNK_ID
     char2idx['PAD'] = PAD_ID
 
-    emb = torch.randn(num_words, w_dim)
-    return UNK_ID, PAD_ID, emb
+    return UNK_ID, PAD_ID, voc_size
 
 
 DATA = 'data/original/Train_Data_F.pickle'
@@ -36,4 +35,4 @@ with open(DATA, 'rb') as f:
     sentences = pickle.load(f)
 CHAR2IDX = count_char(sentences)
 
-UNK_ID, PAD_ID, EMB_TENSOR = get_init_embedding(CHAR2IDX)
+UNK_ID, PAD_ID, voc_size = get_init_embedding(CHAR2IDX)
