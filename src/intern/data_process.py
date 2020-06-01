@@ -68,35 +68,6 @@ def main(DATA_ROOT):
             pickle.dump(results, f)
 
 
-def calc_position(sentence):
-    juman = Juman()
-    try:
-        result = juman.analysis(sentence)
-    except ValueError as e:
-        print(sentence)
-        raise e
-
-    current = 0
-    offset = [0 for _ in range(len(sentence))]
-
-    for mrph in result.mrph_list():
-        current = current + len(mrph.midasi)
-        try:
-            offset[current-1] = 1
-
-        except IndexError as e:
-            print(sentence)
-            print(current)
-            for _mrph in result.mrph_list():
-                print(_mrph.midasi)
-            raise e
-
-        except Exception as e:
-            raise e
-
-    return offset
-
-
 if __name__ == '__main__':
     DATA_ROOT = "data"
     main(DATA_ROOT)
