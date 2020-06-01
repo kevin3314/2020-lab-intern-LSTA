@@ -8,7 +8,7 @@ from consts import UNK_ID, PAD_ID
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, data_path, char2idx):
-        self.data = self.load_data(data_path)
+        self.data, self.target = self.load_data(data_path)
         self.char2idx = char2idx
 
     def __len__(self):
@@ -16,8 +16,8 @@ class Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         data = self.data[idx]
+        target = self.target[idx]
         ids = self.chars2idxs(data)
-        target = self.calc_position(data)
 
         return ids, target
 
@@ -29,29 +29,6 @@ class Dataset(torch.utils.data.Dataset):
 
     def chars2idxs(self, sentence):
         return [self.char2idx.get(char, UNK_ID) for char in sentence]
-
-    def calc_position(self, sentence):
-        juman = Juman()
-        result = juman.analysis(sentence)
-        current = 0
-        offset = [0 for _ in range(len(sentence))]
-
-        for mrph in result.mrph_list():
-            current = current + len(mrph.midasi)
-            try:
-                offset[current-1] = 1
-
-            except IndexError as e:
-                print(sentence)
-                print(current)
-                for _mrph in result.mrph_list():
-                    print(_mrph.midasi)
-                raise e
-
-            except Exception as e:
-                raise e
-
-        return offset
 
 
 # def make_batch(idseq_list, target):

@@ -32,7 +32,8 @@ def get_init_embedding(char2idx, w_dim=128):
 DATA = 'data/original/Train_Data_F.pickle'
 
 with open(DATA, 'rb') as f:
-    sentences = pickle.load(f)
+    # (sentences, offsets)
+    sentences = pickle.load(f)[0]
 CHAR2IDX = count_char(sentences)
 
 UNK_ID, PAD_ID, voc_size = get_init_embedding(CHAR2IDX)

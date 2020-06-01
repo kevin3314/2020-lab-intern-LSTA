@@ -40,7 +40,6 @@ class LSTM_divider(nn.Module):
         # # (batchsize, sent_len, hdims) -> (batchsize, sent_len)
         # hidden_avg = torch.sum(unpacked_hidden, axis=-1) / self.h_dims
 
-        print(hidden_avg.shape)
         out = torch.sigmoid(hidden_avg)
 
         return out
