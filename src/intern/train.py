@@ -78,9 +78,12 @@ def run(
         ):
 
     # Build model
+    print('Building model ...')
     net = LSTM_divider(consts.EMB_TENSOR)
     net.to(device)
+    print('Done!')
 
+    print('Building dataset ...')
     train_dataset = utils.Dataset(
         train_path, consts.CHAR2IDX)
     val_dataset = utils.Dataset(
@@ -98,6 +101,7 @@ def run(
         shuffle=False,
         collate_fn=utils.make_batch
     )
+    print('Done!')
 
     # Class for Early Stopping
     es = utils.EarlyStopping()
